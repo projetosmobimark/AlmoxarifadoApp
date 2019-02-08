@@ -18,7 +18,7 @@ export default class Login extends React.Component {
 
   	constructor(){
 		super();
-		this.state = {usuario:'',senha:''};
+		this.state = {usuario:'',senha:'', usuario_objeto:''};
 	}
 
 	fazLogin(){
@@ -36,7 +36,9 @@ export default class Login extends React.Component {
 		})
 		.then((response) => response.json())
 		.then((responseJson) => {
-		    _signInAsync();
+			
+		    this.setState({usuario_objeto:responseJson});
+		    this._signInAsync();
 		})
 		.catch((error) => {
 		    alert(error);
@@ -45,12 +47,13 @@ export default class Login extends React.Component {
 	}
 
 	static navigationOptions = {
-    title: 'Please sign in',
+    title: 'Login',
   };
 
 	_signInAsync = async () => {
-    await AsyncStorage.setItem('userToken', 'abc');
-    await AsyncStorage.setItem('senha', '1234');
+	var objeto = this.state.usuario_objeto[0];
+    await AsyncStorage.setItem('userToken', objeto.usuario);
+    await AsyncStorage.setItem('id', objeto.id.toString());
     this.props.navigation.navigate('App');
   };
 
@@ -64,7 +67,7 @@ export default class Login extends React.Component {
 				<TextInput placeholder="senha" 
 					onChangeText={texto => this.setState({senha : texto})} />
 				<Button title="Entrar"
-				        onPress={this._signInAsync}
+				        onPress={() =>this.fazLogin()}
 				      />
 			</View>
 			);

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View,ListView, ScrollView ,RefreshControl, FlatList  } from 'react-native';
+import { View,ListView, ScrollView ,RefreshControl, FlatList,AsyncStorage  } from 'react-native';
 import { Container, Content, Button, Icon,Text,List, ListItem} from 'native-base';
 import { Font } from "expo";
 import CardImage from './CardImage.js';
@@ -8,7 +8,6 @@ import CardImage from './CardImage.js';
 
 export default class Historico extends React.Component {
 
-  static id_usuario = 1; //provisório
 
 static navigationOptions = {
     title: 'Histórico',
@@ -17,12 +16,13 @@ static navigationOptions = {
 constructor(){
   super();
   this.ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
-  this.state = {refreshing: false,basic: true,isReady: false,lista:[]};
+  this.state = {refreshing: false,basic: true,isReady: false,lista:[], id_user: ''};
+  
 }
 
 _onRefresh = () => {
     this.setState({refreshing: true});
-    fetch('http://192.168.1.14/api/retiradas/'+1)
+    fetch('http://192.168.1.14/api/retiradas/'+this.state.id_user)
     .then(resposta => resposta.json())
     .then(json => this.setState({lista: json}))
     .then(() => {
@@ -30,12 +30,22 @@ _onRefresh = () => {
     });
   }
 
+ 
+
 componentDidMount(){
-  fetch('http://192.168.1.14/api/retiradas/'+1)
+  this._setIdUsuario();
+  setTimeout(()=>{
+    fetch('http://192.168.1.14/api/retiradas/'+this.state.id_user)
     .then(resposta => resposta.json())
     .then(json => this.setState({lista: json}));
+  },100);
+  
 }
-
+_setIdUsuario = async () => {
+    const id_user = await AsyncStorage.getItem('id');
+    
+    this.setState({id_user:id_user});
+}; 
 
 
 

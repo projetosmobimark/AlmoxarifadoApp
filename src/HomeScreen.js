@@ -16,8 +16,8 @@ static navigationOptions = {
 constructor(){
   super();
   this.ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
-  this.state = {refreshing: false,basic: true,isReady: false,lista:[]};
- 
+  this.state = {refreshing: false,basic: true,isReady: false,lista:[], id_user: ''};
+  
 }
 
 _onRefresh = () => {
@@ -40,6 +40,7 @@ _onRefresh = () => {
   };
 
 componentDidMount(){
+  this._setIdUsuario();
   fetch('http://192.168.1.14/api/produtos')
     .then(resposta => resposta.json())
     .then(json => this.setState({lista: json}))
@@ -54,7 +55,7 @@ retiraProduto(id){
   },
   body: JSON.stringify({
     produto_id: id,
-    usuario_id: '1',
+    usuario_id: this.state.id_user,
     quantidade: '1',
   }),
 });
@@ -64,11 +65,10 @@ retiraProduto(id){
 
 }
 
-_bootstrapAsync = async () => {
-    const userToken = await AsyncStorage.getItem('userToken');
-    const senha = await AsyncStorage.getItem('senha');
-    console.warn(userToken + senha);
-  };
+_setIdUsuario = async () => {
+    const id_user = await AsyncStorage.getItem('id');
+    this.setState({id_user:id_user});
+};  
 
 async componentWillMount() {
     await Font.loadAsync({
