@@ -8,7 +8,7 @@ import { View,
 	AsyncStorage
 } from 'react-native';
 
-import { Container, Header, Content, Footer, FooterTab, Icon,Text,List, ListItem} from 'native-base';
+import {Input, Container, Header, Content, Footer, FooterTab, Icon,Text,List, ListItem,Item,Form,Label} from 'native-base';
 
 
 export default class Login extends React.Component {
@@ -22,7 +22,7 @@ export default class Login extends React.Component {
 	}
 
 	fazLogin(){
-		  fetch('http://192.168.1.14/api/login', {
+		  fetch('http://mobilaravel.herokuapp.com/api/login', {
 		  method: 'POST',
 		  headers: {
 		    Accept: 'application/json',
@@ -52,7 +52,7 @@ export default class Login extends React.Component {
 
 	_signInAsync = async () => {
 	var objeto = this.state.usuario_objeto[0];
-    await AsyncStorage.setItem('userToken', objeto.usuario);
+    await AsyncStorage.setItem('userToken', objeto.nome);
     await AsyncStorage.setItem('id', objeto.id.toString());
     this.props.navigation.navigate('App');
   };
@@ -60,16 +60,25 @@ export default class Login extends React.Component {
 	render(){
 		const {navigate} = this.props.navigation;
 		return(
-			<View styple={{marginTop: 100}}>
-				<TextInput placeholder="usuario" 
+			<Container>
+	        <Content>
+	          <Form>	
+	            <Item floatingLabel>
+	              <Label>Usuario</Label>
+	              <Input type="text"  
 					onChangeText={texto => this.setState({usuario : texto})} />
-
-				<TextInput placeholder="senha" 
+	            </Item>
+	            <Item floatingLabel last>
+	              <Label>Senha</Label>
+	              <Input type="password" 
 					onChangeText={texto => this.setState({senha : texto})} />
-				<Button title="Entrar"
+	            </Item>
+	            <Button title="Entrar"
 				        onPress={() =>this.fazLogin()}
 				      />
-			</View>
+	          </Form>
+	        </Content>
+	      </Container>
 			);
 	}
 

@@ -3,6 +3,7 @@ import React from 'react';
 import HomeScreen from './src/HomeScreen.js'
 import Login from './src/telas/Login.js'
 import Historico from './src/Historico.js'
+import ProfileScreen from './src/ProfileScreen.js'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {
   ActivityIndicator,
@@ -13,6 +14,12 @@ import {
   View,
 } from 'react-native';
 import {createSwitchNavigator,createStackNavigator, createAppContainer, createBottomTabNavigator,} from 'react-navigation';
+
+import { Provider } from 'react-redux';
+import { Store } from './src/store';
+
+import TelaTeste from './src/TelaTeste.js'
+
 
 class AuthLoadingScreen extends React.Component {
   constructor() {
@@ -40,20 +47,32 @@ class AuthLoadingScreen extends React.Component {
   }
 }
 
-
-const AppStack = createStackNavigator({ Home: HomeScreen, Historico: Historico });
+const testeStack = createStackNavigator({ TelaTeste: TelaTeste });
+const AppStack = createStackNavigator({ Home: HomeScreen, Historico: Historico, Profile: ProfileScreen });
 const AuthStack = createStackNavigator({ SignIn: Login });
 
-export default createAppContainer(createSwitchNavigator(
+const AppNavigation = createAppContainer(createSwitchNavigator(
   {
     AuthLoading: AuthLoadingScreen,
     App: AppStack,
     Auth: AuthStack,
+    Testes: testeStack,
   },
   {
-    initialRouteName: 'AuthLoading',
+    initialRouteName: 'Testes',
   }
 ));
+
+export default class App extends React.Component {
+  render() {
+    return (
+      <Provider store={Store}>
+        <AppNavigation />
+      </Provider>
+    );
+  }
+}
+
 
 const styles = StyleSheet.create({
   container: {

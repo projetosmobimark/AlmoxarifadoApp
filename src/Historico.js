@@ -22,7 +22,7 @@ constructor(){
 
 _onRefresh = () => {
     this.setState({refreshing: true});
-    fetch('http://192.168.1.14/api/retiradas/'+this.state.id_user)
+    fetch('http://mobilaravel.herokuapp.com/api/retiradas/'+this.state.id_user)
     .then(resposta => resposta.json())
     .then(json => this.setState({lista: json}))
     .then(() => {
@@ -35,7 +35,7 @@ _onRefresh = () => {
 componentDidMount(){
   this._setIdUsuario();
   setTimeout(()=>{
-    fetch('http://192.168.1.14/api/retiradas/'+this.state.id_user)
+    fetch('http://mobilaravel.herokuapp.com/api/retiradas/'+this.state.id_user)
     .then(resposta => resposta.json())
     .then(json => this.setState({lista: json}));
   },100);

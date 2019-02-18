@@ -4,25 +4,58 @@ import { Container, Header, Content, Footer, FooterTab, Button, Icon,Text,List, 
 import { Font , AppLoading} from "expo";
 import FooterTabsIconText from "./FooterTabsIconText.js"
 import CardImage from "./CardImage.js"
+import firebase from '../firebase.js';
 
 
 
 export default class App extends React.Component {
 
 static navigationOptions = {
-    title: 'Lista Produtos',
+    title: 'Produtos',
   };
 
 constructor(){
   super();
   this.ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
-  this.state = {refreshing: false,basic: true,isReady: false,lista:[], id_user: ''};
+  this.state = {refreshing: false,basic: true,isReady: false,lista:[], id_user: '', flag:''};
+  this.unsubscribe = null;
+  this.ref = firebase.firestore().collection('flag');
+}
+
+onCollectionUpdate = (querySnapshot) => {
+  querySnapshot.forEach((doc) => {
+    const flag_a = doc.data();
+    this.setState({flag:flag_a});
+    fetch('http://mobilaravel.herokuapp.com/api/produtos')
+    .then(resposta => resposta.json())
+    .then(json => this.setState({lista: json}));
+    
+  });
   
+}
+
+notificaMudanca = () => {
+  const updateRef = firebase.firestore().collection('flag').doc('1bmaN5GzDYvhT508NUbh');
+
+  updateRef.get().then((doc) => {
+      if(doc.data().flag){
+        updateRef.set({
+          flag: false
+        });
+      }else{
+        updateRef.set({
+          flag: true
+        });
+      }
+
+  }  );
+  
+    
 }
 
 _onRefresh = () => {
     this.setState({refreshing: true});
-    fetch('http://192.168.1.14/api/produtos')
+    fetch('http://mobilaravel.herokuapp.com/api/produtos')
     .then(resposta => resposta.json())
     .then(json => this.setState({lista: json}))
     .then(() => {
@@ -41,13 +74,14 @@ _onRefresh = () => {
 
 componentDidMount(){
   this._setIdUsuario();
-  fetch('http://192.168.1.14/api/produtos')
+  this.unsubscribe = this.ref.onSnapshot(this.onCollectionUpdate);
+  fetch('http://mobilaravel.herokuapp.com/api/produtos')
     .then(resposta => resposta.json())
     .then(json => this.setState({lista: json}))
 }
 
 retiraProduto(id){
-  fetch('http://192.168.1.14/api/retiradas', {
+  fetch('http://mobilaravel.herokuapp.com/api/retiradas', {
   method: 'POST',
   headers: {
     Accept: 'application/json',
@@ -61,7 +95,7 @@ retiraProduto(id){
 });
   
   setTimeout(() => this._onRefresh(), 200);
-  
+  this.notificaMudanca();
 
 }
 
